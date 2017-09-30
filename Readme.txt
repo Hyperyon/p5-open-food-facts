@@ -1,6 +1,7 @@
-Le script propose à l'utilisateur deux choix
+Au démarrage, le script propose à l'utilisateur deux choix
 1 - Quel aliment souhaitez-vous remplacer ?
 2 - Retrouver mes aliments substitués.
+
 Tant que utilisateur n'a pas tapé un chiffre, il affichera ce menu
 -- vérification de l'user input pour savoir si c'est bien une valeur numérique qui a été saisie
 
