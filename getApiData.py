@@ -16,7 +16,7 @@ with open('categorie.txt', 'r') as f:
     category = f.read().split('\n')
 
 def save_data(data):
-    with open('filter_data', 'wb') as data_file:
+    with open('filter_data5', 'wb') as data_file:
         p = pick.Pickler(data_file)
         p.dump(data)
 
@@ -72,28 +72,30 @@ def gen_filter_data(data, main_category):
 
 
 def check_data():
-    with open('filter_data', 'rb') as f:
+    with open('filter_data5', 'rb') as f:
         data = pick.Unpickler(f)
         return data.load()
 
-'''sorted_data = []
-for cat in category[:100]:      # get only 100 first categories
-    req = url + cat + '.json'
-    print('\n\n'+req)
+sorted_data = []
 
-    data = get_data(req)
+for page in range(20, 25):
+    for cat in category[:100]:      # get only 100 first categories
+        req = url + cat + '/'+ str(page) +'.json'
+        print('\n\n'+req)
 
+        data = get_data(req)
 
-    if data:
-        data = gen_filter_data(data, cat.replace('-', ' '))
-        sorted_data += data
+        if data: #if data not empty
+                    # this-my-category, so I convert '-' to space
+            data = gen_filter_data(data, cat.replace('-', ' '))
+            sorted_data += data
 
-    t.sleep(2.5)
+        t.sleep(3)
 
 save_data(sorted_data)
-'''
 
-a = check_data()
-[print(x[-1]) for x in a[:35]]
-print(len(a))
+
+"""a = check_data()
+[print(x) for x in a[:35]]
+print(len(a))"""
 
