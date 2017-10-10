@@ -2,3 +2,8 @@
 /include
 /lib
 pip-selfcheck.json
+*.pyc
+*.txt
+/extra
+__pycache__
+
