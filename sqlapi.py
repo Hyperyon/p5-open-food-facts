@@ -41,7 +41,7 @@ class SqlApi:
         else:
             element = "`" + element + "`"
         
-        return element 
+        return element
 
     def add_brackets(self, element):
         return ' (' + element + ')'
