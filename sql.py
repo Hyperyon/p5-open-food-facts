@@ -64,7 +64,7 @@ data = ', '.join(data)
 
 start_req = """INSERT INTO `products` (`product_name`, `quantity`, `brands`, `stores`, `code`, `main_category`, `specific_category`) """
 req = start_req + "VALUES " +  data + ";"
-
+print(req[:500])
 #send_data(req)
 
 
