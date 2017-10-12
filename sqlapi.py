@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding:Utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import pymysql as pysql
 import pymysql.cursors as c
@@ -15,11 +15,15 @@ class SqlApi:
         sql = SqlApi('localhost', 'username', 'password', 'db_name')
 
                 # search request
-        req = sql.select('my_table') + sql.where('my_field', "42")
+        req = sql.select('my_table') + sql.where('my_field', '42')
 
                 # insert request
         vals = ['biscuit', 'fraise', 'pomme', 'peche', 'chocolat', 'oreo']
-        req = sql.insert('my_table', 'my_field', 'my_field_2', 'my_field_3') + sql.values(vals)"""
+        req = sql.insert('my_table', 'my_field', 'my_field_2', 'my_field_3') + sql.values(vals)
+                
+                # send request
+        result = sql.send_request(req)
+    """
 
     def __init__(self, host, usr, pwd, db, charset='utf8mb4', cursor=c.DictCursor):
         self.connect = pysql.connect(host=host, user=usr, 
@@ -30,8 +34,9 @@ class SqlApi:
         self.sql = self.connect.cursor()
         self.number_field = 0
 
-    def send_request(self,request):
+    def send_request(self,request, max_rows=20):
         self.sql.execute(request)
+        return self.sql.fetchmany(max_rows)
 
     def add_quotes(self, element, *doublequotes):
         element = element.replace('"', "'")

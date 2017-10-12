@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding:Utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import json
 import urllib.request as get

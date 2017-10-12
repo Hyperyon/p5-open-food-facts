@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding:Utf-8 -*-
+# -*- coding: utf-8 -*-
 
-import urllib.request as get
-import json
-import pymysql
-import pymysql.cursors
+import sqlapi
 
 NUMBER_ITEMS_SHOWN = 20      # show how many category in terminal
 
@@ -38,85 +35,73 @@ class UserInterface:
 
         return int(self.userChoice)
 
+    def showData(self, items):
+        for i, item in enumerate(items):
+            print(i+1, item)
+
 
 class OpenFoodData:
 
-    """Manage all interaction with database"""
+    """Manage all interaction with database. """
+
     def __init__(self):
+        self.sql = sqlapi.SqlApi('localhost', 'nico', 'password', 'OpenFoodFactsDb')
+        self.result = ''
+
+    def save_product(self, request):
         pass
+        #req = self.sql.insert()
+        #req += self.sql.values()
+        #self.sql.send_request()
 
+    def search_products(self, choice):
 
-class SqlRequest:
+        specific_category = self.result[choice-1]['specific_category']
 
-    """ Class allow to read and write mysql database  """
+        req = self.sql.select('products')
+        req += self.sql.where('specific_category', specific_category)
 
-    def __init__(self):
-        self.connexion = pymysql.connect(host='localhost',user='nico',password='password',
-        db='OpenFoodFactsDb',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
-        self.sql = self.connexion.cursor()
-        self.categories = ''
-
-    def write_data(self, request):
-        self.sql.execute(request)
-        self.connexion.commit()
-
-    def search_data(self, request):
-
-        main_category, specific_category = request
-
-        start_req = "SELECT * FROM `products` "
-
-        payload_req = "WHERE `specific_category` = "+ "'" + specific_category + "';"
+        self.result = self.sql.send_request(req)
 
         #payload_req = "WHERE `specific_category` = " + "'" + specific_category + "' "
         #payload_req += "AND `main_category` = "+ "'" + main_category + "';"
-
-        req = start_req + payload_req
-
-        print(req)
-        self.sql.execute(req)
-
-        [print(x,'\n\n') for x in self.sql]
+    
+        return [x['product_name'] for x in self.result]
 
     def get_categories(self):
-        request = """SELECT * FROM `categories`"""
-        self.sql.execute(request)
-        self.categories = self.sql
+        req = self.sql.select('categories')
+        self.result = self.sql.send_request(req)
 
-        return self.categories.fetchmany(NUMBER_ITEMS_SHOWN)
+        self.result = [x['category'] for x in self.result]
+        return self.result
 
-    def get_one_category(self, category):
-        category = "'" + category + "'"
-        request = """SELECT * FROM `products` WHERE `main_category` = """ + category
+    def get_one_category(self, choice):
 
-        self.sql.execute(request)
-        return self.sql.fetchmany(NUMBER_ITEMS_SHOWN)
+        category = self.result[choice-1]
 
+        req = self.sql.select('products')
+        req += self.sql.where('main_category', category)
 
-sql = SqlRequest()
+        self.result = self.sql.send_request(req)
+
+        return [x['product_name'] for x in self.result]
+
+    
 interface = UserInterface()
+data = OpenFoodData()
 
 interface.showMenu()
 answer = interface.getInputUser('menu')
 
-if answer:      #check passed
-    items = sql.get_categories()   # return list of dict
+if answer == 1:
 
-    for item in items:     # need to upgrade
-        print(item['numero'], item['category'])
-
+            # show main categories
+    interface.showData(data.get_categories())
     choice = interface.getInputUser('search')
 
-
-    choosen_category = items[choice-1]['category']
-    result = sql.get_one_category(choosen_category)
-
-    for index, element in enumerate(result):
-        print(index+1, element['product_name'])
-
+            # show products related with choosen category
+    interface.showData(data.get_one_category(choice))
     choice = interface.getInputUser('search')
-    result = result[choice-1]
-    choosen_product = (result['product_name'], result['main_category'], result['specific_category'])
 
-    sql.search_data(choosen_product[1:3])
-    
+            # show best equivalent products
+    interface.showData(data.search_products(choice))
