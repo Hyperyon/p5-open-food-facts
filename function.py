@@ -37,6 +37,7 @@ class UserInterface:
 
     def showData(self, items):
         for i, item in enumerate(items):
+            #pass
             print(i+1, item)
 
 
@@ -63,8 +64,19 @@ class OpenFoodData:
 
         self.result = self.sql.send_request(req)
 
-        #payload_req = "WHERE `specific_category` = " + "'" + specific_category + "' "
-        #payload_req += "AND `main_category` = "+ "'" + main_category + "';"
+        elements = list(set([x['code'] for x in self.result]))
+
+        for i, element in enumerate(elements):
+
+                # need to get only first occurence
+            for item in self.result:
+                if item['code'] == element:
+                    elements[i] = item
+                    break #when found, we leave this loop
+
+        [print(x['product_name'], x['code']) for x in elements]
+
+        # two search mode with spe. cat or with name
     
         return [x['product_name'] for x in self.result]
 
