@@ -1,33 +1,36 @@
-Au démarrage, le script propose à l'utilisateur deux choix
-1 - Quel aliment souhaitez-vous remplacer ?
-2 - Retrouver mes aliments substitués.
+class UserInterface
 
-Tant que utilisateur n'a pas tapé un chiffre, il affichera ce menu
--- vérification de l'user input pour savoir si c'est bien une valeur numérique qui a été saisie
+Cette classe va gérer l'affichage du menu et des données et les saisies de l'utilisateur
 
-
-L'utilisateur tape sa recherche
--- vérif que l'user input, le nom du produit doit être de type alphanumérique (voire que la possibilité de faire recherche qu'avec des lettres)
+showMenu(self)
+    Affiche le menu principal qui propose soit 
+    1. la recherche d'un produit
+    2. l'affichage des produits enrregistrés
 
 
-Le programme génère la requête à l'API Open food fact
--- vérif que l'API nous retourne une réponse, si une erreur s'affiche pouvoir le signaler que sa recherche ne peut aboutir ?
+getInputUser(self, mode) -> return int(userChoice)
+    Gère et vérifie ce que l'utilisateur saisie dans le terminal
+
+showData(self, items)
+    Affiche les données telles que les catégorie ou les produits d'une catégorie spécifique
 
 
-Le programme traite les données d'API
-La fonction fait le tri dans les informations reçues, il n'affiche dans le terminal que les informations pertinentes
 
-Le programme affiche les données dans le terminal
-Un formatage particulier sera peut-être utile
+class OpenFoodData
 
-L'utilisateur sélectionne le produit qui le convient en tapant la valeur correspondant au produit équivalent
---pareil vérif que le choix est bien un integer
+La classe s'occupe de récupérer et d'insérer des informations dans la base de données
 
-Le programme génère la requête SQL
 
-Le programme exécute la requête pour effectuer la sauvegarde en base de données mySQL
+save_product(self, request)
+    Méthode pour sauvegarder un produit en base de données
 
-L'utilisateur décide de retrouver ses aliments substitués
-Le script va effectuer une requête type Select dans la bdd
+search_products(self, choice)
+    Effectuer une recherche pour trouver un produit équivalent
 
-Le programme va finalement afficher les données récupérées préalablement en formation si nécessaire les informations.
+
+get_categories(self) -> return list
+    Obtenir les catégories de produits
+
+
+get_one_category(self, choice) -> return list
+    Obtenir les produits d'une catégorie particulière
