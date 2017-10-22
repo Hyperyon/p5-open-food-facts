@@ -25,7 +25,7 @@ def send_data(request):
 
 
 def get_data(): #filter_data4 NOK
-    with open('filter_data5', 'rb') as f:
+    with open('filter_data4', 'rb') as f:
         data = pick.Unpickler(f)
         return data.load()
 
@@ -50,21 +50,29 @@ for index, item in enumerate(data):
     data[index] = list(map(join_data, item[:-1]))
         # adding main and specific categories
     data[index] += item[-1]
-    data[index] = list(map(add_quotes, data[index]))
+    if '3095758477010' in data[index][4]:
+        data[index][0] = data[index][0].replace('"', "'")
+        print(data[index][0])
 
+    data[index] = list(map(add_quotes, data[index]))
     data[index] = '(' + ','.join(data[index]) + ')'
 
 
+    
+
+print(len(data))
 data = ', '.join(data)
 
 
-
+#26834 products
 
 
 
 start_req = """INSERT INTO `products` (`product_name`, `quantity`, `brands`, `stores`, `code`, `main_category`, `specific_category`) """
 req = start_req + "VALUES " +  data + ";"
-print(req[:500])
+
+
+#print(req[:500])
 #send_data(req)
 
 

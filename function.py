@@ -74,7 +74,7 @@ class OpenFoodData:
                     elements[i] = item
                     break #when found, we leave this loop
 
-        [print(x['product_name'], x['code']) for x in elements]
+        #[print(x['product_name'], x['code']) for x in elements]
 
         # two search mode with spe. cat or with name
     
@@ -98,8 +98,45 @@ class OpenFoodData:
 
         return [x['product_name'] for x in self.result]
 
-    
-interface = UserInterface()
+    def extra(self):
+        req = self.sql.select('categories')
+
+        category = self.sql.send_request(req, 150)
+
+        category = [x['category'] for x in category]
+
+        req = self.sql.select('products')
+        self.result = self.sql.send_request(req, 80000)
+
+        third_table = []
+
+
+        
+        for i, element in enumerate(self.result):
+            a = element['product_name']
+            b = element['quantity']
+            c = element['brands']
+            d = element['stores']
+            e = element['code']
+            f = element['specific_category']
+
+            self.result[i] = [a,b,c,d,e,f]
+
+        self.result = [list(x) for x in set(tuple(row) for row in self.result)]
+        for element in self.result:
+            third_table += element
+
+       
+        
+        #vals = ['10', '2', '5', '4']
+        req = self.sql.insert('temp', 'product_name', 'quantity', 'brands', 'stores', 'code', 'specific_category') + self.sql.values(third_table)
+        #self.sql.send_request(req)
+                
+data = OpenFoodData()
+data.extra()
+
+
+'''interface = UserInterface()
 data = OpenFoodData()
 
 interface.showMenu()
@@ -116,4 +153,4 @@ if answer == 1:
     choice = interface.getInputUser('search')
 
             # show best equivalent products
-    interface.showData(data.search_products(choice))
+    interface.showData(data.search_products(choice))'''
