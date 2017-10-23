@@ -8,22 +8,22 @@ import pymysql.cursors as c
 class SqlApi:
 
     """ Class allow to read and write mysql database. """
-   
+
     """ Quick examples :
-
-                # connection
-        sql = SqlApi('localhost', 'username', 'password', 'db_name')
-
-                # search request
-        req = sql.select('my_table') + sql.where('my_field', '42')
-
-                # insert request
-        vals = ['biscuit', 'fraise', 'pomme', 'peche', 'chocolat', 'oreo']
-        req = sql.insert('my_table', 'my_field', 'my_field_2', 'my_field_3') + sql.values(vals)
-                
-                # send request
-        result = sql.send_request(req)
+            # connection
+    sql = SqlApi('localhost', 'username', 'password', 'db_name')
+            # search request
+    req = sql.select('my_table') + sql.where('my_field', '42')
+            # insert request
+    vals = ['biscuit', 'fraise', 'pomme', 'peche', 'chocolat', 'oreo']
+    req = sql.insert('my_table', 'my_field', 'my_field_2', 'my_field_3') + sql.values(vals)
+            
+            # send request
+    result = sql.send_request(req)
     """
+   
+    # adding method to detect blank space
+    # and remove quote for tables
 
     def __init__(self, host, usr, pwd, db, charset='utf8mb4', cursor=c.DictCursor):
         self.connect = pysql.connect(host=host, user=usr, 
@@ -33,6 +33,7 @@ class SqlApi:
         
         self.sql = self.connect.cursor()
         self.number_field = 0
+
 
     def send_request(self,request, max_rows=20):
         self.sql.execute(request)
@@ -57,7 +58,10 @@ class SqlApi:
         return request
 
     def where(self, table, value):
-        request = " WHERE " + self.add_quotes(table) + " = " + self.add_quotes(value,1)
+        table = self.add_quotes(table)
+        value = self.add_quotes(value,1)
+        request = " WHERE {} = {}".format(table, value)
+
         return request
 
     def insert(self, table, *field):
@@ -71,14 +75,28 @@ class SqlApi:
 
     def values(self, val):
 
-        values = [self.add_quotes(x,1) for x in val]
+        if val is list:
+            values = [self.add_quotes(x,1) for x in val]
+        else:
+            values = self.add_quotes(val,1)
 
         if self.number_field and len(val) % self.number_field == 0:
-            values = list(zip(*[iter(values)]*self.number_field))
-            values = [self.add_brackets(", ".join(x)) for x in values]
-            values = " VALUES" + ",".join(values) + ";"
+
+            # need to upgrade
+
+            if val is list:
+                values = list(zip(*[iter(values)]*self.number_field))
+                values = [self.add_brackets(", ".join(x)) for x in values]
+                values = " VALUES" + ",".join(values) + ";"
+            else:
+                values = " VALUES ("+ values + ");"
         else:
             print('Erreur, valeurs manquantes dans vos champs')
 
         return values
 
+    def inner_join(self, table):
+        return " INNER JOIN {}".format(table)
+
+    def on(self, field, field_2):
+        return " ON {} = {}".format(field, field_2)
