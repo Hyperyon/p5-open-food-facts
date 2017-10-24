@@ -59,7 +59,7 @@ class SqlApi:
 
     def where(self, table, value):
         table = self.add_quotes(table)
-        value = self.add_quotes(value,1)
+        value = self.add_quotes(value, 1)
         request = " WHERE {} = {}".format(table, value)
 
         return request
@@ -76,9 +76,9 @@ class SqlApi:
     def values(self, val):
 
         if val is list:
-            values = [self.add_quotes(x,1) for x in val]
+            values = [self.add_quotes(x, 1) for x in val]
         else:
-            values = self.add_quotes(val,1)
+            values = self.add_quotes(val, 1)
 
         if self.number_field and len(val) % self.number_field == 0:
 

@@ -37,8 +37,12 @@ class UserInterface:
         return int(self.userChoice)
 
     def show_data(self, items):
-        for i, item in enumerate(items):
-            print(i+1, item)
+
+        if len(items) > 1:
+            for i, item in enumerate(items):
+                print(i+1, item)
+        else:
+            print(items[0][0],items[0][1])
 
 
 class OpenFoodData:
@@ -49,13 +53,17 @@ class OpenFoodData:
         self.sql = sqlapi.SqlApi('localhost', 'nico', 'password', 'OpenFoodFactsDb')
         self.result = ''
 
-    def save_product(self, choice):
+    def save_product(self):
         req = self.sql.insert('save_product', 'code_product')
-        req += self.sql.values(self.result[choice-1]['code'])
+        req += self.sql.values(self.result[0]['code'])
 
         self.sql.send_request(req)
 
     def search_products(self, choice):
+
+        """Get specific catgory of searched product 
+        then ask the db to find all product related of searched product
+        """
 
         specific_category = self.result[choice-1]['specific_category']
 
@@ -64,7 +72,8 @@ class OpenFoodData:
 
         self.result = self.sql.send_request(req)
     
-        return [(x['product_name'], x['code']) for x in self.result]
+        #return [(x['product_name'], x['code']) for x in self.result]
+        return [[self.result[0]['product_name'], self.result[0]['code']]]
 
     def get_categories(self):
         req = self.sql.select('categories')
@@ -86,25 +95,42 @@ class OpenFoodData:
 
         return [x['product_name'] for x in self.result]
 
-                
+    def get_save_product(self):
+        req = self.sql.select('save_product')
+        req += self.sql.inner_join('products')
+        req += self.sql.on('save_product.code_product', 'products.code')
+        self.result = self.sql.send_request(req)
+
+        return [(x['product_name'], x['code']) for x in self.result]
+
+
 interface = UserInterface()
 data = OpenFoodData()
 
 interface.show_menu()
 answer = interface.get_user_input('menu')
 
+# search mode
 if answer == 1:
 
-            # show main categories
+    # show main categories
     interface.show_data(data.get_categories())
     category_choice = interface.get_user_input('search')
 
-            # show products related with choosen category
+    # show products related with choosen category
     interface.show_data(data.get_one_category(category_choice))
     product_choice = interface.get_user_input('search')
 
-            # show best equivalent products
+    # show product want to replace
     interface.show_data(data.search_products(product_choice))
-    better_choice = interface.get_user_input('search')
 
-    data.save_product(better_choice)
+    is_saved = input('Souhaitez vous sauvegarder le produit ?\n1 (oui), 0 (non) :\n') 
+    if is_saved == '1':
+        data.save_product()
+        print('Produit sauvegardé avec succès')
+
+
+# view mode
+if answer == 2:
+    interface.show_data(data.get_save_product())
+
