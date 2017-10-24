@@ -81,7 +81,7 @@ Génère une prérequête pour la requête INSERT
 
     values(self, val):
 Génère une prérequête pour la requête VALUES
-
+ 
     inner_join(self, table):
 Génère une prérequête pour la requête INNER JOIN
 
