@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sqlapi
+import json
 
 # show how many category in terminal
 NUMBER_ITEMS_SHOWN = 20      
@@ -50,30 +51,17 @@ class OpenFoodData:
     """Manage all interaction with database. """
 
     def __init__(self):
-        self.sql = sqlapi.SqlApi('localhost', 'nico', 'password', 'OpenFoodFactsDb')
+
+        self.config = None
+        with open('deployment/config.json', 'r') as file:
+            self.config = json.load(file)
+
+        self.sql = sqlapi.SqlApi(self.config['host'],
+                                self.config['user'],
+                                self.config['password'],
+                                self.config['db'])
         self.result = ''
 
-    def save_product(self):
-        req = self.sql.insert('save_product', 'code_product')
-        req += self.sql.values(self.result[0]['code'])
-
-        self.sql.send_request(req)
-
-    def search_products(self, choice):
-
-        """Get specific catgory of searched product 
-        then ask the db to find all product related of searched product
-        """
-
-        specific_category = self.result[choice-1]['specific_category']
-
-        req = self.sql.select('products')
-        req += self.sql.where('specific_category', specific_category)
-
-        self.result = self.sql.send_request(req)
-    
-        #return [(x['product_name'], x['code']) for x in self.result]
-        return [[self.result[0]['product_name'], self.result[0]['code']]]
 
     def get_categories(self):
         req = self.sql.select('categories')
@@ -95,6 +83,32 @@ class OpenFoodData:
 
         return [x['product_name'] for x in self.result]
 
+        
+    def search_products(self, choice):
+
+        """Get specific catgory of searched product 
+        then ask the db to find all product related of searched product
+        """
+
+        specific_category = self.result[choice-1]['specific_category']
+
+        req = self.sql.select('products')
+        req += self.sql.where('specific_category', specific_category)
+
+        self.result = self.sql.send_request(req)
+    
+        #return [(x['product_name'], x['code']) for x in self.result]
+        return [[self.result[0]['product_name'], self.result[0]['code']]]
+
+    def get_product_link(self):
+        return "https://fr.openfoodfacts.org/produit/{}/".format(self.result[0]['code'])
+
+    def save_product(self):
+        req = self.sql.insert('save_product', 'code_product')
+        req += self.sql.values(self.result[0]['code'])
+
+        self.sql.send_request(req)
+
     def get_save_product(self):
         req = self.sql.select('save_product')
         req += self.sql.inner_join('products')
@@ -102,6 +116,7 @@ class OpenFoodData:
         self.result = self.sql.send_request(req)
 
         return [(x['product_name'], x['code']) for x in self.result]
+
 
 
 interface = UserInterface()
@@ -123,6 +138,7 @@ if answer == 1:
 
     # show product want to replace
     interface.show_data(data.search_products(product_choice))
+    print(data.get_product_link())
 
     is_saved = input('Souhaitez vous sauvegarder le produit ?\n1 (oui), 0 (non) :\n') 
     if is_saved == '1':

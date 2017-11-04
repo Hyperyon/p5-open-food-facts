@@ -39,34 +39,25 @@ class SqlApi:
         self.sql.execute(request)
         return self.sql.fetchmany(max_rows)
 
-    def add_quotes(self, element, *doublequotes):
+    def add_quotes(self, element):
         element = element.replace('"', "'")
-
-        if(doublequotes):
-            element = '"' + element + '"'
-        else:
-            element = "`" + element + "`"
-        
-        return element
+        return '"' + element + '"'
 
     def add_brackets(self, element):
         return ' (' + element + ')'
 
-
     def select(self, table):
-        request = "SELECT * FROM " + self.add_quotes(table)
+        request = "SELECT * FROM " + table
         return request
 
     def where(self, table, value):
-        table = self.add_quotes(table)
-        value = self.add_quotes(value, 1)
+        value = self.add_quotes(value)
         request = " WHERE {} = {}".format(table, value)
 
         return request
 
     def insert(self, table, *field):
         self.number_field = len(field)
-        table = self.add_quotes(table)
         field = ", ".join(field)
         field = self.add_brackets(field)
 
@@ -76,9 +67,9 @@ class SqlApi:
     def values(self, val):
 
         if val is list:
-            values = [self.add_quotes(x, 1) for x in val]
+            values = [self.add_quotes(x) for x in val]
         else:
-            values = self.add_quotes(val, 1)
+            values = self.add_quotes(val)
 
         if self.number_field and len(val) % self.number_field == 0:
 

@@ -1,0 +1,6 @@
+{
+    "host" : "localhost",
+    "user": "nico",
+    "password": "password",
+    "db": "OpenFoodFactsDb"
+}
