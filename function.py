@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sqlapi
+import deployment.sqlapi as sqlapi
 import json
 
 # show how many category in terminal
