@@ -13,11 +13,7 @@ MAX_NB_CATEGORY = 2
 # define how many product we want : 20 products / page
 MAX_NB_PAGE = 2
 
-
 cat_url = 'https://fr.openfoodfacts.org/categories.json'
-#product_url = 'https://fr.openfoodfacts.org/categorie/'
-
-
 config = None
 
 with open('config.json', 'r') as file:
@@ -31,7 +27,6 @@ sql = sqlapi.SqlApi(config['host'],
                     config['user'],
                     config['password'],
                     config['db'])
-
 
 
 def get_data(full_url):
@@ -67,7 +62,7 @@ def no_empty_str(x):
         x = 'aucun'
     return x
 
-def fill_product_table(data):
+def fill_product_table(data, main_category):
     wanted_keys = ['product_name','quantity','brands', 'stores_tags','code']
 
     for item in data['products']:
@@ -101,22 +96,30 @@ def fill_product_table(data):
                          'stores', 
                          'specific_category')
 
-        # part 2/2 : generate VALUES
+        # part 2/2 : generate VALUES request
         req += sql.values(values)
 
         # finally excecute sql request
         sql.send_request(req)
         print(item['product_name'])
 
+        fill_cat_product_table(main_category, item['code'])
+
+def fill_cat_product_table(category, product_code):
+    req = sql.insert('category_product', 'f_category', 'f_product')
+    req += sql.values([category, product_code])
+    sql.send_request(req)
+
+
 data = get_category()
 
+# add check function to avoid duplicate category
 
-'''# insert categories into database
+# insert categories into database
 for category in data['tags'][:MAX_NB_CATEGORY]:
     request = sql.insert('categories', 'category')
     request += sql.values(category['name'])
-    sql.send_request(request)'''
-
+    sql.send_request(request)
 
 for index in range(MAX_NB_CATEGORY):
     current_cat = data['tags'][index]['name']
@@ -124,7 +127,9 @@ for index in range(MAX_NB_CATEGORY):
 
     for page in range(1, MAX_NB_PAGE):
         url = data['tags'][index]['url'] + '&json='+str(page)
-        fill_product_table(get_data(url))
+
+        # take index to determine category
+        fill_product_table(get_data(url), str(index+1))
         
         # avoid to overload server
         t.sleep(3)
