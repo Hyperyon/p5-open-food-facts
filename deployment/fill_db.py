@@ -82,7 +82,7 @@ def fill_product_table(data):
 
         # get last category
         specific_category = item['categories'].split(',')[-1]
-        # remove space
+        # remove start and end space from str
         specific_category = specific_category.strip()
 
         values = [item['code'], item['product_name'],
@@ -92,6 +92,7 @@ def fill_product_table(data):
         # each time we have empty value in field, we replace by 'aucun'
         values = list(map(no_empty_str, values))
 
+        # part 1/2 : generate INSERT INTO request
         req = sql.insert('products', 
                          'code', 
                          'product_name', 
@@ -100,11 +101,12 @@ def fill_product_table(data):
                          'stores', 
                          'specific_category')
 
-        #print(type(values))
-
-        print(item['product_name'])
+        # part 2/2 : generate VALUES
         req += sql.values(values)
+
+        # finally excecute sql request
         sql.send_request(req)
+        print(item['product_name'])
 
 data = get_category()
 
