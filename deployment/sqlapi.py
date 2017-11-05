@@ -36,7 +36,7 @@ class SqlApi:
 
 
     def send_request(self,request, max_rows=20):
-        print(self.sql.execute(request))
+        self.sql.execute(request)
         return self.sql.fetchmany(max_rows)
 
     def add_quotes(self, element):

@@ -5,9 +5,12 @@
 import json
 import urllib.request as get
 import time as t
+import sqlapi
 
 
-MAX_CATEGORY = 2
+
+# this var define nb categories we get
+MAX_NB_CATEGORY = 20
 cat_url = 'https://fr.openfoodfacts.org/categories.json'
 #product_url = 'https://fr.openfoodfacts.org/categorie/'
 # get category first
@@ -37,8 +40,6 @@ def get_category():
             data = get_data(cat_url)
             json.dump(data, file)
 
-    '''for index in range(MAX_CATEGORY):
-                    categories.append(data['tags'][index]['name'])'''
     return data
 
 def filtered_data(data):
@@ -47,13 +48,36 @@ def filtered_data(data):
 
 
 data = get_category()
+config = None
+
+with open('config.json', 'r') as file:
+    config = json.load(file)
 
 
-for index in range(MAX_CATEGORY):
+# Remove after
+config['db'] = 'oui'
+
+
+# connect to database
+sql = sqlapi.SqlApi(config['host'],
+                    config['user'],
+                    config['password'],
+                    config['db'])
+
+
+# insert categories into database
+for category in data['tags'][:MAX_NB_CATEGORY]:
+    request = sql.insert('categories', 'category')
+    request += sql.values(category['name'])
+    sql.send_request(request)
+
+
+'''for index in range(MAX_NB_CATEGORY):
     print('\nGet item from '+data['tags'][index]['name'],)
 
     for page in range(1, 2):
         url = data['tags'][index]['url'] + '&json='+str(page)
         filtered_data(get_data(url))
-
-        t.sleep(3)
+        
+        # avoid to overload server
+        t.sleep(3)'''
