@@ -8,7 +8,12 @@ import sqlapi
 
 
 # this var define nb categories we get
-MAX_NB_CATEGORY = 20
+MAX_NB_CATEGORY = 2
+
+# define how many product we want : 20 products / page
+MAX_NB_PAGE = 2
+
+
 cat_url = 'https://fr.openfoodfacts.org/categories.json'
 #product_url = 'https://fr.openfoodfacts.org/categorie/'
 
@@ -56,11 +61,50 @@ def get_category():
 
     return data
 
+
+def no_empty_str(x):
+    if len(x) == 0:
+        x = 'aucun'
+    return x
+
 def fill_product_table(data):
-    field = ['code', 'product_name', 'quantity', 'brands', 'stores', 'specific_category']
+    wanted_keys = ['product_name','quantity','brands', 'stores_tags','code']
+
     for item in data['products']:
-        print(item['product_name'], item['code'])
-        #req = sql.insert('products', )
+
+        # sometimes product missing some wanted information
+        json_item_keys = list(item.keys())
+
+        # if yes, we leave the loop
+        if len(set(json_item_keys) & set(wanted_keys)) != 5:
+            print('Missing field for "{}" product'.format(item['product_name']))
+            break
+
+        # get last category
+        specific_category = item['categories'].split(',')[-1]
+        # remove space
+        specific_category = specific_category.strip()
+
+        values = [item['code'], item['product_name'],
+                  item['quantity'], item['brands'],
+                  item['stores'], specific_category]
+
+        # each time we have empty value in field, we replace by 'aucun'
+        values = list(map(no_empty_str, values))
+
+        req = sql.insert('products', 
+                         'code', 
+                         'product_name', 
+                         'quantity', 
+                         'brands', 
+                         'stores', 
+                         'specific_category')
+
+        #print(type(values))
+
+        print(item['product_name'])
+        req += sql.values(values)
+        sql.send_request(req)
 
 data = get_category()
 
@@ -76,7 +120,7 @@ for index in range(MAX_NB_CATEGORY):
     current_cat = data['tags'][index]['name']
     print('\nGet item from ' + current_cat,)
 
-    for page in range(1, 2):
+    for page in range(1, MAX_NB_PAGE):
         url = data['tags'][index]['url'] + '&json='+str(page)
         fill_product_table(get_data(url))
         

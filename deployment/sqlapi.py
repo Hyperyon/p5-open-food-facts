@@ -65,8 +65,7 @@ class SqlApi:
         return request
 
     def values(self, val):
-
-        if val is list:
+        if 'list' in str(type(val)):
             values = [self.add_quotes(x) for x in val]
         else:
             values = self.add_quotes(val)
@@ -75,7 +74,7 @@ class SqlApi:
 
             # need to upgrade
 
-            if val is list:
+            if 'list' in str(type(val)):
                 values = list(zip(*[iter(values)]*self.number_field))
                 values = [self.add_brackets(", ".join(x)) for x in values]
                 values = " VALUES" + ",".join(values) + ";"
