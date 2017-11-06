@@ -5,7 +5,7 @@ import deployment.sqlapi as sqlapi
 import json
 
 # show how many category in terminal
-NUMBER_ITEMS_SHOWN = 20      
+NUMBER_ITEMS_SHOWN = 20
 
 
 class UserInterface:
@@ -16,10 +16,11 @@ class UserInterface:
         self.userChoice = ''
 
     def show_menu(self):
-        print('1. Chercher un meilleur produit')
-        print('2. Consulter les produits sauvegardés')
+        print('01. Chercher un meilleur produit')
+        print('02. Consulter les produits sauvegardés')
 
-    def get_user_input(self, mode):     # need to upgrade
+    # need to upgrade
+    def get_user_input(self, mode):
 
         proceed = True
         while 'is not numeric choice' and proceed:
@@ -41,7 +42,9 @@ class UserInterface:
 
         if len(items) > 1:
             for i, item in enumerate(items):
-                print(i+1, item)
+                print('{:02d}. {}'.format(i+1, item))
+
+        # need to upgrade 
         else:
             print(items[0][0],items[0][1])
 
@@ -79,7 +82,7 @@ class OpenFoodData:
         req += self.sql.on('category_product.f_product', 'products.code')
         req += self.sql.where('f_category', category)
 
-        self.result = self.sql.send_request(req)
+        self.result = self.sql.send_request(req, NUMBER_ITEMS_SHOWN)
 
         return [x['product_name'] for x in self.result]
 
@@ -97,7 +100,6 @@ class OpenFoodData:
 
         self.result = self.sql.send_request(req)
     
-        #return [(x['product_name'], x['code']) for x in self.result]
         return [[self.result[0]['product_name'], self.result[0]['code']]]
 
     def get_product_link(self):
@@ -118,7 +120,6 @@ class OpenFoodData:
         return [(x['product_name'], x['code']) for x in self.result]
 
 
-
 interface = UserInterface()
 data = OpenFoodData()
 
@@ -133,14 +134,18 @@ if answer == 1:
     category_choice = interface.get_user_input('search')
 
     # show products related with choosen category
-    interface.show_data(data.get_one_category(category_choice))
+    old_user_choice = data.get_one_category(category_choice)
+    interface.show_data(old_user_choice)
     product_choice = interface.get_user_input('search')
 
     # show product want to replace
+    print('Produit initial ' + old_user_choice[product_choice-1])
     interface.show_data(data.search_products(product_choice))
     print(data.get_product_link())
 
-    is_saved = input('Souhaitez vous sauvegarder le produit ?\n1 (oui), 0 (non) :\n') 
+    print('01. Oui')
+    print('02. Non')
+    is_saved = input('Souhaitez vous sauvegarder le produit ? : ') 
     if is_saved == '1':
         data.save_product()
         print('Produit sauvegardé avec succès')

@@ -31,7 +31,8 @@ sql = sqlapi.SqlApi(config['host'],
 
 def get_data(full_url):
     data = get.urlopen(full_url).read()
-    data = data.decode('Utf-8')     # we receive byte data
+    # we receive byte data
+    data = data.decode('Utf-8')
     json_data = False
 
     try:
