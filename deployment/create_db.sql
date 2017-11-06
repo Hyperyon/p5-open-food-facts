@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 05, 2017 at 12:13 PM
+-- Generation Time: Nov 06, 2017 at 08:44 PM
 -- Server version: 10.1.26-MariaDB-0+deb9u1
 -- PHP Version: 7.0.19-1
 
@@ -19,8 +19,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `oui`
 --
-CREATE DATABASE IF NOT EXISTS `oui` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `oui`;
 
 -- --------------------------------------------------------
 
@@ -51,6 +49,7 @@ CREATE TABLE `category_product` (
 --
 
 CREATE TABLE `products` (
+  `id` int(11) NOT NULL,
   `code` varchar(20) NOT NULL,
   `product_name` varchar(150) NOT NULL,
   `quantity` varchar(80) NOT NULL,
@@ -92,6 +91,7 @@ ALTER TABLE `category_product`
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `code` (`code`);
 
 --
@@ -109,12 +109,17 @@ ALTER TABLE `save_product`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `numero` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `numero` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT for table `products`
+--
+ALTER TABLE `products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 --
 -- AUTO_INCREMENT for table `save_product`
 --
 ALTER TABLE `save_product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- Constraints for dumped tables
 --
