@@ -67,13 +67,13 @@ def fill_product_table(data, main_category):
 
     for item in data['products']:
 
-        # sometimes product missing some wanted information
         json_item_keys = list(item.keys())
 
-        # if yes, we leave the loop
+        # sometimes product missing some wanted information
         if len(set(json_item_keys) & set(wanted_keys)) != 5:
             print('Missing field for "{}" product'.format(item['product_name']))
-            break
+            # if yes, we don't execute instructions below
+            continue
 
         # get last category
         specific_category = item['categories'].split(',')[-1]
@@ -111,17 +111,29 @@ def fill_cat_product_table(category, product_code):
     sql.send_request(req)
 
 
+def fill_category_table():
+
+    # check to avoid duplicate category
+    result = sql.send_request('SELECT COUNT(`category`) FROM categories ')
+    nb_categories = result[0]['COUNT(`category`)']
+
+    if (nb_categories < MAX_NB_CATEGORY):
+    # insert categories into database
+        for category in data['tags'][:MAX_NB_CATEGORY]:
+            request = sql.insert('categories', 'category')
+            request += sql.values(category['name'])
+            sql.send_request(request)
+    else:
+        print('Categories table already filled')
+
+
 data = get_category()
 
-# add check function to avoid duplicate category
 
-# insert categories into database
-for category in data['tags'][:MAX_NB_CATEGORY]:
-    request = sql.insert('categories', 'category')
-    request += sql.values(category['name'])
-    sql.send_request(request)
+fill_category_table()
 
-for index in range(MAX_NB_CATEGORY):
+
+'''for index in range(MAX_NB_CATEGORY):
     current_cat = data['tags'][index]['name']
     print('\nGet item from ' + current_cat,)
 
@@ -132,4 +144,4 @@ for index in range(MAX_NB_CATEGORY):
         fill_product_table(get_data(url), str(index+1))
         
         # avoid to overload server
-        t.sleep(3)
+        t.sleep(3)'''
