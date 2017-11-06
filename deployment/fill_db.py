@@ -113,12 +113,13 @@ def fill_cat_product_table(category, product_code):
 
 def fill_category_table():
 
-    # check to avoid duplicate category
+    # get nb of categories in db if exist
     result = sql.send_request('SELECT COUNT(`category`) FROM categories ')
     nb_categories = result[0]['COUNT(`category`)']
 
+    # check to avoid duplicate category
     if (nb_categories < MAX_NB_CATEGORY):
-    # insert categories into database
+        # insert categories into database
         for category in data['tags'][:MAX_NB_CATEGORY]:
             request = sql.insert('categories', 'category')
             request += sql.values(category['name'])
@@ -133,15 +134,15 @@ data = get_category()
 fill_category_table()
 
 
-'''for index in range(MAX_NB_CATEGORY):
+for index in range(MAX_NB_CATEGORY):
     current_cat = data['tags'][index]['name']
     print('\nGet item from ' + current_cat,)
 
-    for page in range(1, MAX_NB_PAGE):
+    for page in range(1, MAX_NB_PAGE+1):
         url = data['tags'][index]['url'] + '&json='+str(page)
 
         # take index to determine category
         fill_product_table(get_data(url), str(index+1))
         
         # avoid to overload server
-        t.sleep(3)'''
+        t.sleep(3)
