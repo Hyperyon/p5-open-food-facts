@@ -128,6 +128,16 @@ def fill_category_table():
         print('Categories table already filled')
 
 
+def remove_duplicate_row():
+    req = '''SET FOREIGN_KEY_CHECKS = 0;
+             DELETE t1 FROM products t1
+             INNER JOIN products t2
+             WHERE t1.id < t2.id and t1.code = t2.code;
+             SET FOREIGN_KEY_CHECKS = 1;'''
+
+    sql.send_request(req)
+
+
 data = get_category()
 
 
@@ -146,3 +156,5 @@ for index in range(MAX_NB_CATEGORY):
         
         # avoid to overload server
         t.sleep(3)
+
+remove_duplicate_row()
