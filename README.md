@@ -3,22 +3,22 @@
 class UserInterface
 ```
 
-Cette classe va gérer l'affichage du menu et des données et les saisies de l'utilisateur
+Class show menu and user interface 
 
     show_menu(self)
 
-Affiche le menu principal qui propose soit 
+Show main menu like below
 1. la recherche d'un produit
 2. l'affichage des produits enrregistrés
 
 
     get_user_input(self, mode) -> return int(userChoice)
 
-Gère et vérifie ce que l'utilisateur saisie dans le terminal
+Check user input in terminal
 
     show_data(self, items)
 
-Affiche les données telles que les catégorie ou les produits d'une catégorie spécifique
+Show data like catoegories or list of products
 
 
 
@@ -26,64 +26,63 @@ Affiche les données telles que les catégorie ou les produits d'une catégorie 
 class OpenFoodData
 ```
 
-La classe s'occupe de récupérer et d'insérer des informations dans la base de données
-
+Manage intput and output data in database
 
     save_product(self, request)
 
-Méthode pour sauvegarder un produit en base de données
+Saving product which selected by user
 
     search_products(self, choice)
 
-Effectuer une recherche pour trouver un produit équivalent
+Search equivalent products
 
 
     get_categories(self) -> return list
 
-Obtenir les catégories de produits
+Get in database a list of available categories
 
 
     get_one_category(self, choice) -> return list
 
-Obtenir les produits d'une catégorie particulière
+Get family of product selected by user
 
 
     get_save_product(self) -> return list
 
-Obtenir les produits choisis précédemment par l'utilisateur
+Get all saved products saved before by user
 
 
 ```python
 class SqlApi
 ```
 
-Cette classe gère les requêtes SQL en se chargeant de formater correctement les demandes envoyées par la classe `OpenFoodData`
+This class manage all SQL request sent by `OpenFoodData` class
 
-    send_request(self)
+    send_request(req, self)
 
-Exécute la requête
+Excute the request
 
     add_quotes(self, element, *doublequotes):
 
-Rajoute des quotes là où c'est nécessaire (utile particule sur les valeurs)
+Adding quote to generate request (usefull on values)
 
     add_brackets(self, element):
-Ajoute des parenthèses
+Adding brackets on element request syntax
 
     select(self, table):
-Génère une prérequête pour la requête sql SELECT
+Generate first step of request syntax
 
     where(self, table, value):
-Génère une prérequête pour la requête sql WHERE
+Generate where sql request syntax
 
     insert(self, table, *field):
-Génère une prérequête pour la requête INSERT
+Generate insert sql request syntax
 
     values(self, val):
-Génère une prérequête pour la requête VALUES
+Generate values request syntax
  
     inner_join(self, table):
-Génère une prérequête pour la requête INNER JOIN
+Generate inner join request syntax
 
     on(self, field, field_2):
-Génère une prérequête pour la requête ON
+Generate 'on' request syntax

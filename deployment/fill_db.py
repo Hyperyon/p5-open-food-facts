@@ -88,12 +88,12 @@ def fill_product_table(data, main_category):
         values = list(map(no_empty_str, values))
 
         # part 1/2 : generate INSERT INTO request
-        req = sql.insert('products', 
-                         'code', 
-                         'product_name', 
-                         'quantity', 
-                         'brands', 
-                         'stores', 
+        req = sql.insert('products',
+                         'code',
+                         'product_name',
+                         'quantity',
+                         'brands',
+                         'stores',
                          'specific_category')
 
         # part 2/2 : generate VALUES request
