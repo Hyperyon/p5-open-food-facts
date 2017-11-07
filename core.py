@@ -40,6 +40,9 @@ class UserInterface:
 
     def show_data(self, items):
 
+        if type(items[0]) == dict:
+            items = [item['product_name'] for item in items]
+
         if len(items) > 1:
             for i, item in enumerate(items):
                 print('{:02d}. {}'.format(i+1, item))
@@ -55,6 +58,7 @@ class OpenFoodData:
 
     def __init__(self):
 
+        self.result = None
         self.config = None
         with open('deployment/config.json', 'r') as file:
             self.config = json.load(file)
@@ -63,7 +67,6 @@ class OpenFoodData:
                                 self.config['user'],
                                 self.config['password'],
                                 self.config['db'])
-        self.result = ''
 
 
     def get_categories(self):
@@ -84,7 +87,8 @@ class OpenFoodData:
 
         self.result = self.sql.send_request(req, NUMBER_ITEMS_SHOWN)
 
-        return [x['product_name'] for x in self.result]
+        return self.result
+        #return [x['product_name'] for x in self.result]
 
         
     def search_products(self, choice):
@@ -99,8 +103,25 @@ class OpenFoodData:
         req += self.sql.where('specific_category', specific_category)
 
         self.result = self.sql.send_request(req)
-    
-        return [[self.result[0]['product_name'], self.result[0]['code']]]
+
+        # if not found equivalent product
+        if len(self.result) == 1:
+
+            # make a join
+            req = self.sql.select('category_product cp')
+            req += self.sql.inner_join('products p')
+            req += self.sql.on('cp.f_product', 'p.code')
+
+            # seach with main category
+            req += self.sql.where('cp.f_category', '13') # change
+
+            # using word in product name to make search
+            req += " AND p.product_name REGEXP 'fusilli|romage|talien'" # change
+            
+            self.result = self.sql.send_request(req)
+        
+        # first row it same product selected by user, so take the last row
+        return [[self.result[-1]['product_name'], self.result[-1]['code']]]
 
     def get_product_link(self):
         return "https://fr.openfoodfacts.org/produit/{}/".format(self.result[0]['code'])
@@ -139,9 +160,15 @@ if answer == 1:
     product_choice = interface.get_user_input('search')
 
     # show product want to replace
-    print('Produit initial ' + old_user_choice[product_choice-1])
+    old_product = old_user_choice[product_choice-1]
+    old_code = old_product['code']
+    print('Produit initial')
+    print(old_product['product_name'], old_code, '\n')
+
+
+    print('Produit trouvé')
     interface.show_data(data.search_products(product_choice))
-    print(data.get_product_link())
+    #print(data.get_product_link())
 
     print('01. Oui')
     print('02. Non')
