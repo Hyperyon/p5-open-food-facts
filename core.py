@@ -88,10 +88,9 @@ class OpenFoodData:
         self.result = self.sql.send_request(req, NUMBER_ITEMS_SHOWN)
 
         return self.result
-        #return [x['product_name'] for x in self.result]
 
         
-    def search_products(self, choice):
+    def search_products(self, choice, main_category):
 
         """Get specific catgory of searched product 
         then ask the db to find all product related of searched product
@@ -104,31 +103,37 @@ class OpenFoodData:
 
         self.result = self.sql.send_request(req)
 
-        # if not found equivalent product
+        # first row it same product selected by user, so take the last row
+        item = self.result[-1]
+
+        # if not found equivalent product, search other product
         if len(self.result) == 1:
 
-            # make a join
+            # make a join to build request
             req = self.sql.select('category_product cp')
             req += self.sql.inner_join('products p')
             req += self.sql.on('cp.f_product', 'p.code')
 
-            # seach with main category
-            req += self.sql.where('cp.f_category', '13') # change
+            # search with main category
+            req += self.sql.where('cp.f_category', str(main_category))
 
-            # using word in product name to make search
-            req += " AND p.product_name REGEXP 'fusilli|romage|talien'" # change
+            # using words in product name to make search
+            search_pattern = item['product_name'].split(' ')
+
+            # pipe is OR operator
+            search_pattern = '|'.join(search_pattern)
+            req += " AND p.product_name REGEXP '{}'".format(search_pattern) # enhance
             
-            self.result = self.sql.send_request(req)
+            item = self.sql.send_request(req)[-1]
         
-        # first row it same product selected by user, so take the last row
-        return [[self.result[-1]['product_name'], self.result[-1]['code']]]
+        return [[item['product_name'], item['code']]]
 
     def get_product_link(self):
-        return "https://fr.openfoodfacts.org/produit/{}/".format(self.result[0]['code'])
+        return "https://fr.openfoodfacts.org/produit/{}/".format(self.result[-1]['code'])
 
     def save_product(self):
         req = self.sql.insert('save_product', 'code_product')
-        req += self.sql.values(self.result[0]['code'])
+        req += self.sql.values(self.result[-1]['code'])
 
         self.sql.send_request(req)
 
@@ -153,6 +158,7 @@ if answer == 1:
     # show main categories
     interface.show_data(data.get_categories())
     category_choice = interface.get_user_input('search')
+    print(type(category_choice))
 
     # show products related with choosen category
     old_user_choice = data.get_one_category(category_choice)
@@ -167,7 +173,8 @@ if answer == 1:
 
 
     print('Produit trouvé')
-    interface.show_data(data.search_products(product_choice))
+    match_product = data.search_products(product_choice, category_choice)
+    interface.show_data(match_product)
     #print(data.get_product_link())
 
     print('01. Oui')
