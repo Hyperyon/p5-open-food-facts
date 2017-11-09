@@ -37,20 +37,21 @@ Manage intput and output data in database
 
 Saving product which selected by user
 
-    search_products(self, choice)
+    search_products(self, choice, main_category)
 
 Search equivalent products
-
 
     get_categories(self) -> return list
 
 Get in database a list of available categories
 
-
-    get_one_category(self, choice) -> return list
+    get_one_category(self, category_numero) -> return list
 
 Get family of product selected by user
 
+    get_product_link(self) -> return str
+
+Get url product choosen by user
 
     get_save_product(self) -> return list
 
