@@ -1,16 +1,22 @@
+![python](https://img.shields.io/badge/python-3.5-blue.svg)
 
-```python
+P5 - Open food facts
+===
+Program allow to search better food with information based on Open Food Facts
+
+
 class UserInterface
-```
+---
 
 Class show menu and user interface 
 
     show_menu(self)
 
 Show main menu like below
-1. la recherche d'un produit
-2. l'affichage des produits enrregistrés
-
+```
+01. Chercher un meilleur produit
+02. Consulter les produits sauvegardés
+```
 
     get_user_input(self, mode) -> return int(userChoice)
 
@@ -22,9 +28,8 @@ Show data like catoegories or list of products
 
 
 
-```python
 class OpenFoodData
-```
+---
 
 Manage intput and output data in database
 
@@ -52,9 +57,8 @@ Get family of product selected by user
 Get all saved products saved before by user
 
 
-```python
 class SqlApi
-```
+---
 
 This class manage all SQL request sent by `OpenFoodData` class
 
