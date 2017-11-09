@@ -49,7 +49,8 @@ class UserInterface:
 
         # need to upgrade 
         else:
-            print(items[0][0],items[0][1])
+            item = items[0]
+            [print(info) for info in item]
 
 
 class OpenFoodData:
@@ -126,7 +127,11 @@ class OpenFoodData:
             
             item = self.sql.send_request(req)[-1]
         
-        return [[item['product_name'], item['code']]]
+        return [[item['product_name'],
+                 item['code'],
+                 item['brands'],
+                 item['quantity'],
+                 item['stores']]]
 
     def get_product_link(self):
         return "https://fr.openfoodfacts.org/produit/{}/".format(self.result[-1]['code'])
@@ -175,7 +180,7 @@ if answer == 1:
     print('Produit trouvé')
     match_product = data.search_products(product_choice, category_choice)
     interface.show_data(match_product)
-    #print(data.get_product_link())
+    print(data.get_product_link())
 
     print('01. Oui')
     print('02. Non')
